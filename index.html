@@ -104,6 +104,7 @@
     }
     .cur-ring.hov .cur-label { opacity: 1; }
     .cur-halo { position: fixed; top: 0; left: 0; width: 340px; height: 340px; border-radius: 50%; pointer-events: none; z-index: 1; background: radial-gradient(circle, rgba(200,135,58,0.07) 0%, transparent 65%); will-change: transform; mix-blend-mode: screen; }
+    #grainCanvas { position: fixed; inset: 0; pointer-events: none; z-index: 3; opacity: 0.038; mix-blend-mode: overlay; }
     #steamCanvas { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
     @media (hover:hover) and (pointer:fine) { body { cursor: none; } }
 
@@ -335,9 +336,15 @@
     .rev-link { margin-left: auto; font-size: 0.78rem; color: var(--muted); text-decoration: none; border-bottom: 1px solid var(--muted); padding-bottom: 1px; transition: color 0.2s, border-color 0.2s; }
     .rev-link:hover { color: var(--amber); border-color: var(--amber); }
     .vline { width: 1px; height: 34px; background: var(--line); }
-    .revs-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 1rem; }
-    .rev-card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 1.5rem; display: flex; flex-direction: column; gap: 0.8rem; transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s; }
-    .rev-card:hover { transform: translateY(-4px); border-color: rgba(200,135,58,0.3); box-shadow: 0 16px 30px -22px rgba(0,0,0,0.6); }
+    /* reviews marquee */
+    .revs-marquee { overflow: hidden; mask-image: linear-gradient(90deg, transparent 0%, #000 8%, #000 92%, transparent 100%); -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 8%, #000 92%, transparent 100%); }
+    .revs-track { display: flex; gap: 1rem; width: max-content; margin-bottom: 1rem; }
+    .revs-track.rt1 { animation: revScroll 38s linear infinite; }
+    .revs-track.rt2 { animation: revScroll 38s linear infinite reverse; }
+    .revs-marquee:hover .revs-track { animation-play-state: paused; }
+    @keyframes revScroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+    .rev-card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 1.5rem; display: flex; flex-direction: column; gap: 0.8rem; transition: border-color 0.3s, box-shadow 0.3s, transform 0.35s cubic-bezier(.22,.61,.36,1); width: 300px; flex-shrink: 0; }
+    .rev-card:hover { border-color: rgba(200,135,58,0.32); box-shadow: 0 18px 34px -20px rgba(0,0,0,0.65); }
     .rev-head { display: flex; align-items: center; gap: 0.8rem; }
     .rev-av { width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: var(--sans); font-size: 0.88rem; font-weight: 600; color: #fff; flex-shrink: 0; }
     .rev-av.a1 { background: #7b4e2a; } .rev-av.a2 { background: #3d6e4a; } .rev-av.a3 { background: #4e3d7b; } .rev-av.a4 { background: #7b3d3d; }
@@ -425,7 +432,6 @@
     @media (max-width: 1024px) {
       .menu-row  { grid-template-columns: repeat(2,1fr); }
       .menu-row3 { grid-template-columns: repeat(2,1fr); }
-      .revs-grid { grid-template-columns: repeat(2,1fr); }
       .sede-cards { grid-template-columns: repeat(2,1fr); }
     }
     @media (max-width: 768px) {
@@ -437,7 +443,6 @@
       .nos-visual { max-width: 400px; margin: 0 auto; }
       .menu-main { grid-template-columns: 1fr; }
       .menu-row, .menu-row3 { grid-template-columns: 1fr 1fr; }
-      .revs-grid { grid-template-columns: 1fr; }
       .foot-grid { grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2.5rem; }
       .sede-cards, .sede-cards-2 { grid-template-columns: 1fr; }
       .rot-badge, .hcard { display: none; }
@@ -469,6 +474,7 @@
 <div class="cur-dot"  id="curDot"></div>
 <div class="cur-ring" id="curRing"><span class="cur-label" id="curLabel"></span></div>
 <div class="cur-halo" id="curHalo"></div>
+<canvas id="grainCanvas"></canvas>
 <canvas id="steamCanvas"></canvas>
 
 <!-- Nav -->
@@ -911,50 +917,62 @@
       </div>
       <a href="https://www.google.com/search?q=kahwa+cafe+buenos+aires" target="_blank" rel="noopener" class="rev-link">Ver en Google ↗</a>
     </div>
-    <div class="revs-grid">
-      <div class="rev-card reveal">
-        <div class="rev-head">
-          <div class="rev-av a1">LP</div>
-          <div>
-            <div class="rev-author">Lucía Pereyra</div>
-            <div class="rev-meta">12 reseñas · Local Guide</div>
-          </div>
+    <div class="revs-marquee" id="revsMar">
+      <!-- track 1: scrolls left -->
+      <div class="revs-track rt1" id="revT1">
+        <div class="rev-card">
+          <div class="rev-head"><div class="rev-av a1">LP</div><div><div class="rev-author">Lucía Pereyra</div><div class="rev-meta">12 reseñas · Local Guide</div></div></div>
+          <div class="rev-stars-row"><span class="st">★★★★★</span><span class="dt">hace 1 semana</span></div>
+          <p class="rev-text">El pistacho es una locura. Estoy enganchada desde que lo probé. Los baristas saben lo que hacen y el ambiente es increíble. La sede de Palermo es mi oficina de los sábados.</p>
         </div>
-        <div class="rev-stars-row"><span class="st">★★★★★</span><span class="dt">hace 1 semana</span></div>
-        <p class="rev-text">El pistacho es una locura. Estoy enganchada desde que lo probé. Los baristas saben lo que hacen y el ambiente es increíble. La sede de Palermo es mi oficina de los sábados.</p>
+        <div class="rev-card">
+          <div class="rev-head"><div class="rev-av a2">MA</div><div><div class="rev-author">Martín Aguirre</div><div class="rev-meta">5 reseñas</div></div></div>
+          <div class="rev-stars-row"><span class="st">★★★★★</span><span class="dt">hace 3 semanas</span></div>
+          <p class="rev-text">Pedí el V60 con un Etiopía natural y fue una experiencia. El barista me explicó el proceso de tostado, el origen, el perfil. No es solo un café, es educación de verdad.</p>
+        </div>
+        <div class="rev-card">
+          <div class="rev-head"><div class="rev-av a3">SC</div><div><div class="rev-author">Sofía Castillo</div><div class="rev-meta">8 reseñas</div></div></div>
+          <div class="rev-stars-row"><span class="st">★★★★★</span><span class="dt">hace 2 semanas</span></div>
+          <p class="rev-text">Vine por el matcha y me fui con un cold brew también. El espacio de Cañitas es divino, luminoso y tranquilo. Ya vine tres veces en el mismo mes.</p>
+        </div>
+        <div class="rev-card">
+          <div class="rev-head"><div class="rev-av a4">FR</div><div><div class="rev-author">Federico Romero</div><div class="rev-meta">20 reseñas · Local Guide</div></div></div>
+          <div class="rev-stars-row"><span class="st">★★★★☆</span><span class="dt">hace 1 mes</span></div>
+          <p class="rev-text">Muy buen café de especialidad, de los mejores de CABA. El flat white está en su punto exacto. Muy recomendable para cualquier amante del buen café.</p>
+        </div>
+        <div class="rev-card">
+          <div class="rev-head"><div class="rev-av a2">VS</div><div><div class="rev-author">Valentina Silva</div><div class="rev-meta">3 reseñas</div></div></div>
+          <div class="rev-stars-row"><span class="st">★★★★★</span><span class="dt">hace 5 días</span></div>
+          <p class="rev-text">Fui con un grupo y todos quedamos encantados. La rosca con cardamomo y el latte de avena son combinación perfecta. Volvemos la próxima semana, seguro.</p>
+        </div>
       </div>
-      <div class="rev-card reveal d1">
-        <div class="rev-head">
-          <div class="rev-av a2">MA</div>
-          <div>
-            <div class="rev-author">Martín Aguirre</div>
-            <div class="rev-meta">5 reseñas</div>
-          </div>
+      <!-- track 2: scrolls right -->
+      <div class="revs-track rt2" id="revT2">
+        <div class="rev-card">
+          <div class="rev-head"><div class="rev-av a4">NG</div><div><div class="rev-author">Nicolás García</div><div class="rev-meta">31 reseñas · Local Guide</div></div></div>
+          <div class="rev-stars-row"><span class="st">★★★★★</span><span class="dt">hace 2 semanas</span></div>
+          <p class="rev-text">De los mejores cold brew de Buenos Aires. Saben tratar el origen, el perfil de tueste importa acá. No es café de cadena, es artesanía en serio.</p>
         </div>
-        <div class="rev-stars-row"><span class="st">★★★★★</span><span class="dt">hace 3 semanas</span></div>
-        <p class="rev-text">Pedí el V60 con un Etiopía natural y fue una experiencia. El barista me explicó el proceso de tostado, el origen, el perfil. No es solo un café, es educación de verdad.</p>
-      </div>
-      <div class="rev-card reveal d2">
-        <div class="rev-head">
-          <div class="rev-av a3">SC</div>
-          <div>
-            <div class="rev-author">Sofía Castillo</div>
-            <div class="rev-meta">8 reseñas</div>
-          </div>
+        <div class="rev-card">
+          <div class="rev-head"><div class="rev-av a1">CR</div><div><div class="rev-author">Camila Ríos</div><div class="rev-meta">7 reseñas</div></div></div>
+          <div class="rev-stars-row"><span class="st">★★★★★</span><span class="dt">hace 4 días</span></div>
+          <p class="rev-text">El cappuccino tiene la proporción exacta, crema perfecta. Pedí el bagel de salmón y fue una sorpresa increíble. La sede de Belgrano tiene mucha onda.</p>
         </div>
-        <div class="rev-stars-row"><span class="st">★★★★★</span><span class="dt">hace 2 semanas</span></div>
-        <p class="rev-text">Vine por el matcha y me fui con un cold brew también. El espacio de Cañitas es divino, luminoso y tranquilo. Ya vine tres veces en el mismo mes.</p>
-      </div>
-      <div class="rev-card reveal d3">
-        <div class="rev-head">
-          <div class="rev-av a4">FR</div>
-          <div>
-            <div class="rev-author">Federico Romero</div>
-            <div class="rev-meta">20 reseñas · Local Guide</div>
-          </div>
+        <div class="rev-card">
+          <div class="rev-head"><div class="rev-av a3">DP</div><div><div class="rev-author">Diego Palma</div><div class="rev-meta">14 reseñas</div></div></div>
+          <div class="rev-stars-row"><span class="st">★★★★★</span><span class="dt">hace 10 días</span></div>
+          <p class="rev-text">Música ambient perfecta, luz natural, mesas cómodas. Puedo trabajar acá horas sin que me molesten. El espresso es de otro nivel, consistente visita a visita.</p>
         </div>
-        <div class="rev-stars-row"><span class="st">★★★★☆</span><span class="dt">hace 1 mes</span></div>
-        <p class="rev-text">Muy buen café de especialidad, de los mejores de CABA. El flat white está en su punto exacto. Muy recomendable para cualquier amante del buen café.</p>
+        <div class="rev-card">
+          <div class="rev-head"><div class="rev-av a2">AM</div><div><div class="rev-author">Ana Mendoza</div><div class="rev-meta">9 reseñas · Local Guide</div></div></div>
+          <div class="rev-stars-row"><span class="st">★★★★☆</span><span class="dt">hace 3 semanas</span></div>
+          <p class="rev-text">Gran variedad de filtrados, el Aeropress fue revelador. El personal explica cada método sin hacerse el especialista. Se nota la pasión real por el café.</p>
+        </div>
+        <div class="rev-card">
+          <div class="rev-head"><div class="rev-av a1">JL</div><div><div class="rev-author">Javier López</div><div class="rev-meta">2 reseñas</div></div></div>
+          <div class="rev-stars-row"><span class="st">★★★★★</span><span class="dt">hace 1 semana</span></div>
+          <p class="rev-text">Primera vez que vengo y ya quiero volver. El latte de pistacho es adictivo. El ambiente oscuro y cálido es exactamente lo que uno busca para un domingo tranquilo.</p>
+        </div>
       </div>
     </div>
   </div>
@@ -1669,7 +1687,19 @@ document.querySelectorAll('.magnetic').forEach(function(btn) {
   });
 })();
 
+// ── Review marquee: duplicate tracks for seamless loop ──
+['revT1','revT2'].forEach(function(id) {
+  var track = document.getElementById(id);
+  if (!track) return;
+  var clone = track.cloneNode(true);
+  clone.removeAttribute('id');
+  clone.setAttribute('aria-hidden', 'true');
+  track.parentNode.appendChild(clone);
+});
+
 // ── Review card tilt ──
+var revsMar = document.getElementById('revsMar');
+if (revsMar) revsMar.style.perspective = '1200px';
 document.querySelectorAll('.rev-card').forEach(function(card) {
   card.addEventListener('mousemove', function(e) {
     var r  = card.getBoundingClientRect();
@@ -1679,7 +1709,6 @@ document.querySelectorAll('.rev-card').forEach(function(card) {
   });
   card.addEventListener('mouseleave', function() { card.style.transform = ''; });
 });
-document.querySelector('.revs-grid').style.perspective = '1200px';
 
 // ── Carta tabs ──
 document.querySelectorAll('.ctab').forEach(function(tab) {
@@ -1700,6 +1729,43 @@ document.querySelectorAll('.map-btn').forEach(function(btn) {
     mapFrame.src = 'https://www.google.com/maps?q=' + btn.dataset.q + '&output=embed';
   });
 });
+
+// ── Film grain overlay ──
+(function() {
+  var c   = document.getElementById('grainCanvas');
+  if (!c) return;
+  var ctx = c.getContext('2d');
+  var W, H;
+  var TILE = 220, N = 4, fi = 0;
+  var patterns = [];
+
+  function makePattern() {
+    var oc   = document.createElement('canvas');
+    oc.width = oc.height = TILE;
+    var oct  = oc.getContext('2d');
+    var img  = oct.createImageData(TILE, TILE);
+    var d    = img.data;
+    for (var i = 0; i < d.length; i += 4) {
+      var v = Math.random() * 255 | 0;
+      d[i] = d[i+1] = d[i+2] = v; d[i+3] = 255;
+    }
+    oct.putImageData(img, 0, 0);
+    return ctx.createPattern(oc, 'repeat');
+  }
+
+  function resize() { W = c.width = window.innerWidth; H = c.height = window.innerHeight; }
+  window.addEventListener('resize', resize, { passive: true });
+  resize();
+
+  for (var i = 0; i < N; i++) patterns.push(makePattern());
+
+  (function tick() {
+    ctx.fillStyle = patterns[fi % N];
+    ctx.fillRect(0, 0, W, H);
+    fi++;
+    setTimeout(tick, 75); // ~13fps — subtle flicker
+  })();
+})();
 </script>
 </body>
 </html>
