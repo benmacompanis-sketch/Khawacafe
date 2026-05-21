@@ -125,26 +125,50 @@
 
     /* ── Hero ── */
     #hero { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 9rem 2rem 7rem; position: relative; overflow: hidden; }
+    #hero::after { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 80% 60% at 50% 40%, rgba(200,135,58,0.04) 0%, transparent 70%); pointer-events: none; z-index: 1; }
     .hero-bg { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
-    .hblob { position: absolute; border-radius: 50%; filter: blur(90px); will-change: transform; }
-    .hblob.b1 { width: 520px; height: 520px; top: -160px; left: -120px; background: rgba(200,135,58,0.10); animation: drift 16s ease-in-out infinite; }
-    .hblob.b2 { width: 420px; height: 420px; bottom: -100px; right: -100px; background: rgba(232,200,112,0.07); animation: drift 21s ease-in-out infinite reverse; }
-    .hblob.b3 { width: 260px; height: 260px; top: 38%; right: 18%; background: rgba(200,135,58,0.06); animation: float 12s ease-in-out infinite; }
+    .hblob { position: absolute; border-radius: 50%; filter: blur(100px); will-change: transform; }
+    .hblob.b1 { width: 600px; height: 600px; top: -200px; left: -160px; background: rgba(200,135,58,0.11); animation: drift 18s ease-in-out infinite; }
+    .hblob.b2 { width: 500px; height: 500px; bottom: -120px; right: -120px; background: rgba(232,200,112,0.07); animation: drift 24s ease-in-out infinite reverse; }
+    .hblob.b3 { width: 300px; height: 300px; top: 35%; right: 15%; background: rgba(200,135,58,0.06); animation: float 14s ease-in-out infinite; }
     #hero > * { position: relative; z-index: 2; }
-    .hero-eyebrow { margin-bottom: 2rem; animation: fadeUp 0.9s 0.2s both; }
-    .hero-title { font-family: var(--serif); font-weight: 800; font-size: clamp(4.2rem, 13vw, 10.5rem); line-height: 0.92; letter-spacing: -0.03em; margin-bottom: 1.6rem; }
-    .hero-title .ln1 { display: block; -webkit-text-stroke: 1px var(--cream); color: transparent; animation: fadeUp 1s 0.35s both; }
-    .hero-title .ln2 { display: block; color: var(--amber); animation: fadeUp 1s 0.5s both; }
-    .hero-desc { font-size: clamp(1rem, 1.5vw, 1.15rem); color: var(--cream2); max-width: 500px; margin: 0 auto 2.5rem; animation: fadeUp 0.9s 0.75s both; }
-    .hero-btns { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; animation: fadeUp 0.9s 1s both; }
-    .hero-meta { margin-top: 4rem; display: flex; align-items: center; gap: 1.2rem; font-size: 0.72rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); animation: fadeUp 0.9s 1.2s both; flex-wrap: wrap; justify-content: center; }
+
+    /* eyebrow con líneas decorativas */
+    .hero-eyebrow { margin-bottom: 2.2rem; display: flex; align-items: center; gap: 1rem; justify-content: center; animation: fadeUp 0.9s 5.1s both; }
+    .hero-eyebrow::before, .hero-eyebrow::after { content: ''; height: 1px; width: 36px; background: linear-gradient(90deg, transparent, var(--amber)); opacity: 0.6; flex-shrink: 0; }
+    .hero-eyebrow::after { background: linear-gradient(90deg, var(--amber), transparent); }
+
+    /* título con overflow hidden para la animación de chars */
+    .hero-title { font-family: var(--serif); font-weight: 800; font-size: clamp(4.6rem, 14vw, 11.5rem); line-height: 0.9; letter-spacing: -0.03em; margin-bottom: 1.8rem; }
+    .hero-ln-wrap { display: block; overflow: hidden; padding-bottom: 0.06em; }
+    .hero-title .ln1 { display: block; -webkit-text-stroke: 1.5px var(--cream); color: transparent; }
+    .hero-title .ln2 { display: block; color: var(--amber); }
+
+    /* animación carácter por carácter */
+    .hero-char { display: inline-block; animation: charReveal 0.75s cubic-bezier(.22,.61,.36,1) both; will-change: transform; }
+    @keyframes charReveal {
+      from { opacity: 0; transform: translateY(110%) skewY(6deg); }
+      to   { opacity: 1; transform: translateY(0)   skewY(0deg); }
+    }
+
+    .hero-desc { font-size: clamp(1rem, 1.5vw, 1.15rem); color: var(--cream2); max-width: 500px; margin: 0 auto 2.5rem; animation: fadeUp 0.9s 5.9s both; }
+    .hero-btns { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; animation: fadeUp 0.9s 6.15s both; }
+    .hero-meta { margin-top: 4rem; display: flex; align-items: center; gap: 1.2rem; font-size: 0.72rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); animation: fadeUp 0.9s 6.4s both; flex-wrap: wrap; justify-content: center; }
     .hero-meta .sep { width: 3px; height: 3px; border-radius: 50%; background: var(--muted); }
-    .hcard { position: absolute; background: rgba(28,25,22,0.82); backdrop-filter: blur(12px); border: 1px solid rgba(200,135,58,0.22); border-radius: 12px; padding: 0.9rem 1.2rem; z-index: 3; }
+
+    /* scroll indicator */
+    .hero-scroll { position: absolute; bottom: 2.2rem; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 0.55rem; z-index: 3; animation: fadeUp 0.9s 6.8s both; }
+    .hero-scroll-line { width: 1px; height: 48px; background: var(--line); position: relative; overflow: hidden; }
+    .hero-scroll-line::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, var(--amber), transparent); animation: scrollDrop 2s ease-in-out infinite; }
+    @keyframes scrollDrop { 0%,100% { transform: translateY(-100%); } 50% { transform: translateY(100%); } }
+    .hero-scroll-lbl { font-size: 0.58rem; letter-spacing: 0.28em; text-transform: uppercase; color: var(--muted); }
+
+    .hcard { position: absolute; background: rgba(28,25,22,0.85); backdrop-filter: blur(14px); border: 1px solid rgba(200,135,58,0.25); border-radius: 14px; padding: 1rem 1.3rem; z-index: 3; }
     .hcard.ca { top: 22%; left: 3.5%; animation: floatY 5s -1s ease-in-out infinite; }
     .hcard.cb { top: 60%; right: 3.5%; animation: floatY 5s -2.5s ease-in-out infinite; }
-    .hcard .cn { font-family: var(--serif); font-weight: 800; font-size: 1.7rem; color: var(--amber); line-height: 1; }
-    .hcard .cl { font-size: 0.62rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin-top: 0.15rem; }
-    .rot-badge { position: absolute; bottom: 2rem; right: 2.5rem; width: 115px; height: 115px; z-index: 3; animation: fadeUp 0.9s 1.5s both; pointer-events: none; }
+    .hcard .cn { font-family: var(--serif); font-weight: 800; font-size: 1.8rem; color: var(--amber); line-height: 1; }
+    .hcard .cl { font-size: 0.62rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin-top: 0.2rem; }
+    .rot-badge { position: absolute; bottom: 2rem; right: 2.5rem; width: 115px; height: 115px; z-index: 3; animation: fadeUp 0.9s 6.6s both; pointer-events: none; }
     .rot-badge .ring-txt { width: 100%; height: 100%; animation: spin 22s linear infinite; }
     .rot-badge .badge-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 38px; height: 38px; background: var(--amber); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
     .rot-badge .badge-center svg { width: 20px; height: 20px; fill: var(--bg); }
@@ -409,8 +433,8 @@
   </div>
   <p class="eyebrow hero-eyebrow">Speciality Coffee House · Buenos Aires</p>
   <h1 class="hero-title">
-    <span class="ln1">Kahwa</span>
-    <span class="ln2">Café</span>
+    <span class="hero-ln-wrap"><span class="ln1" id="heroLn1">Kahwa</span></span>
+    <span class="hero-ln-wrap"><span class="ln2" id="heroLn2">Café</span></span>
   </h1>
   <p class="hero-desc">Granos de origen seleccionados. Baristas apasionados. Métodos de extracción que transforman cada taza en una experiencia única.</p>
   <div class="hero-btns">
@@ -426,6 +450,10 @@
     <span>Belgrano · Las Lomitas</span>
     <span class="sep"></span>
     <span>Lun–Vie 7:30 a 20:00</span>
+  </div>
+  <div class="hero-scroll" aria-hidden="true">
+    <div class="hero-scroll-line"></div>
+    <span class="hero-scroll-lbl">Scroll</span>
   </div>
   <div class="rot-badge">
     <svg class="ring-txt" viewBox="0 0 120 120">
@@ -1298,6 +1326,29 @@
     pageDone = true;
     if (animDone) document.getElementById('loader').classList.add('out');
   });
+})();
+
+// ── Hero: animación carácter por carácter ──
+(function() {
+  var LDR_EXIT = 5.0; // segundos — cuando el loader termina
+  var STAGGER  = 0.055;
+
+  function splitLine(id, startDelay) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    var text = el.textContent;
+    el.textContent = '';
+    text.split('').forEach(function(ch, i) {
+      var s = document.createElement('span');
+      s.className = 'hero-char';
+      s.style.animationDelay = (startDelay + i * STAGGER) + 's';
+      s.textContent = ch === ' ' ? ' ' : ch;
+      el.appendChild(s);
+    });
+  }
+
+  splitLine('heroLn1', LDR_EXIT + 0.15);
+  splitLine('heroLn2', LDR_EXIT + 0.45);
 })();
 
 // ── Nav scroll ──
