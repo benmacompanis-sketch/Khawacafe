@@ -80,10 +80,30 @@
 
     /* ── Global ── */
     .scroll-prog { position: fixed; top: 0; left: 0; height: 2px; background: linear-gradient(90deg, var(--amber), var(--gold)); width: 0; z-index: 200; transition: width 0.1s linear; }
-    .cur-dot  { position: fixed; width: 6px; height: 6px; border-radius: 50%; background: var(--amber); pointer-events: none; z-index: 9998; transform: translate(-50%,-50%); }
-    .cur-ring { position: fixed; width: 38px; height: 38px; border-radius: 50%; border: 1.5px solid var(--amber); pointer-events: none; z-index: 9997; transform: translate(-50%,-50%); opacity: 0.5; transition: width 0.3s, height 0.3s, opacity 0.3s, border-color 0.3s; }
-    .cur-ring.hov { width: 58px; height: 58px; opacity: 0.9; border-color: var(--gold); }
-    .cur-halo { position: fixed; top: 0; left: 0; width: 300px; height: 300px; border-radius: 50%; pointer-events: none; z-index: 1; background: radial-gradient(circle, rgba(200,135,58,0.07) 0%, transparent 65%); transform: translate(-50%,-50%); mix-blend-mode: screen; }
+    /* cursor — GPU-composited via transform, never left/top */
+    .cur-dot  { position: fixed; top: 0; left: 0; width: 7px; height: 7px; border-radius: 50%; background: var(--amber); pointer-events: none; z-index: 9999; will-change: transform; }
+    .cur-ring {
+      position: fixed; top: 0; left: 0; width: 40px; height: 40px; border-radius: 50%;
+      border: 1.5px solid rgba(200,135,58,0.6);
+      pointer-events: none; z-index: 9997; will-change: transform;
+      opacity: 0.52; display: flex; align-items: center; justify-content: center;
+      transition: border-color 0.3s, opacity 0.3s;
+    }
+    .cur-ring.hov  { border-color: var(--amber); opacity: 1; }
+    .cur-ring.click::after {
+      content: ''; position: absolute; inset: -2px; border-radius: 50%;
+      border: 1.5px solid rgba(200,135,58,0.75); pointer-events: none;
+      animation: ringBurst 0.42s ease-out forwards;
+    }
+    @keyframes ringBurst { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(2.2); opacity: 0; } }
+    .cur-label {
+      font-family: var(--sans); font-size: 0.48rem; font-weight: 600;
+      letter-spacing: 0.13em; text-transform: uppercase; color: var(--amber);
+      opacity: 0; transition: opacity 0.22s; white-space: nowrap;
+      pointer-events: none; position: absolute; user-select: none;
+    }
+    .cur-ring.hov .cur-label { opacity: 1; }
+    .cur-halo { position: fixed; top: 0; left: 0; width: 340px; height: 340px; border-radius: 50%; pointer-events: none; z-index: 1; background: radial-gradient(circle, rgba(200,135,58,0.07) 0%, transparent 65%); will-change: transform; mix-blend-mode: screen; }
     #steamCanvas { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
     @media (hover:hover) and (pointer:fine) { body { cursor: none; } }
 
@@ -118,7 +138,9 @@
     .nav-logo svg { width: 24px; height: 24px; fill: var(--amber); flex-shrink: 0; }
     .nav-logo span { color: var(--amber); }
     .nav-links { display: flex; align-items: center; gap: 2.2rem; list-style: none; }
-    .nav-links a { color: var(--cream); text-decoration: none; font-size: 0.83rem; opacity: 0.68; transition: opacity 0.2s, color 0.2s; }
+    .nav-links a { color: var(--cream); text-decoration: none; font-size: 0.83rem; opacity: 0.68; transition: opacity 0.2s, color 0.2s; position: relative; }
+    .nav-links a:not(.nav-cta)::after { content: ''; position: absolute; bottom: -3px; left: 0; width: 0; height: 1px; background: var(--amber); transition: width 0.32s cubic-bezier(.22,.61,.36,1); }
+    .nav-links a:not(.nav-cta):hover::after { width: 100%; }
     .nav-links a:hover { opacity: 1; color: var(--amber); }
     .nav-cta { background: var(--amber) !important; color: var(--bg) !important; padding: 0.55rem 1.3rem !important; border-radius: 999px !important; opacity: 1 !important; font-weight: 600 !important; font-size: 0.8rem !important; transition: background 0.25s, transform 0.25s !important; }
     .nav-cta:hover { background: var(--amber2) !important; transform: translateY(-1px); }
@@ -179,8 +201,10 @@
     .btn-wa:hover { background: #1db954; transform: translateY(-2px); box-shadow: 0 12px 26px -12px rgba(37,211,102,0.55); }
     .btn-wa:hover::before { transform: translateX(100%); }
     .btn-wa svg { width: 18px; height: 18px; flex-shrink: 0; }
-    .btn-primary { background: var(--amber); color: var(--bg); padding: 1rem 2rem; border-radius: 999px; font-family: var(--sans); font-size: 0.88rem; font-weight: 500; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem; transition: transform 0.25s, box-shadow 0.3s, background 0.25s; }
+    .btn-primary { background: var(--amber); color: var(--bg); padding: 1rem 2rem; border-radius: 999px; font-family: var(--sans); font-size: 0.88rem; font-weight: 500; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem; transition: transform 0.25s, box-shadow 0.3s, background 0.25s; position: relative; overflow: hidden; }
+    .btn-primary::before { content: ''; position: absolute; inset: 0; background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.22) 50%, transparent 70%); transform: translateX(-100%); transition: transform 0.65s cubic-bezier(.22,.61,.36,1); }
     .btn-primary:hover { background: var(--amber2); transform: translateY(-2px); box-shadow: 0 12px 26px -14px rgba(200,135,58,0.5); }
+    .btn-primary:hover::before { transform: translateX(100%); }
     .btn-outline { background: transparent; border: 1.5px solid rgba(236,231,221,0.28); color: var(--cream); padding: 1rem 2rem; border-radius: 999px; font-family: var(--sans); font-size: 0.88rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem; transition: border-color 0.25s, background 0.25s, color 0.25s; }
     .btn-outline:hover { border-color: var(--amber); background: rgba(200,135,58,0.09); color: var(--amber); }
 
@@ -443,7 +467,7 @@
 
 <div class="scroll-prog" id="scrollProg"></div>
 <div class="cur-dot"  id="curDot"></div>
-<div class="cur-ring" id="curRing"></div>
+<div class="cur-ring" id="curRing"><span class="cur-label" id="curLabel"></span></div>
 <div class="cur-halo" id="curHalo"></div>
 <canvas id="steamCanvas"></canvas>
 
@@ -1416,29 +1440,98 @@ var revObs = new IntersectionObserver(function(entries) {
 }, { threshold: 0.1 });
 document.querySelectorAll('.reveal').forEach(function(el) { revObs.observe(el); });
 
-// ── Custom cursor ──
-var curDot  = document.getElementById('curDot');
-var curRing = document.getElementById('curRing');
-var curHalo = document.getElementById('curHalo');
-var mx = 0, my = 0, rx = 0, ry = 0, hx = 0, hy = 0;
-document.addEventListener('mousemove', function(e) { mx = e.clientX; my = e.clientY; });
-(function animCursor() {
-  rx += (mx - rx) * 0.14;
-  ry += (my - ry) * 0.14;
-  hx += (mx - hx) * 0.08;
-  hy += (my - hy) * 0.08;
-  curDot.style.left  = mx + 'px';
-  curDot.style.top   = my + 'px';
-  curRing.style.left = rx + 'px';
-  curRing.style.top  = ry + 'px';
-  curHalo.style.left = hx + 'px';
-  curHalo.style.top  = hy + 'px';
-  requestAnimationFrame(animCursor);
+// ── Custom cursor (GPU-composited via transform) ──
+(function() {
+  var dot   = document.getElementById('curDot');
+  var ring  = document.getElementById('curRing');
+  var halo  = document.getElementById('curHalo');
+  var label = document.getElementById('curLabel');
+  if (!dot || !ring) return;
+
+  var DOT_R  = 3.5;   // half of 7px
+  var RING_R = 20;    // half of 40px
+  var HALO_R = 170;   // half of 340px
+
+  var mx = 0, my = 0;           // raw mouse
+  var rx = 0, ry = 0;           // ring lerp
+  var rpx = 0, rpy = 0;         // ring prev (velocity)
+  var hx = 0, hy = 0;           // halo lerp
+  var ringScale = 1;            // lerped scale (1 → 1.5 on hover)
+  var isHov = false;
+  var rotDeg = 0;               // current ring rotation (from velocity)
+
+  document.addEventListener('mousemove', function(e) { mx = e.clientX; my = e.clientY; });
+
+  // click burst
+  document.addEventListener('mousedown', function() { ring.classList.add('click'); });
+  document.addEventListener('mouseup',   function() {
+    setTimeout(function() { ring.classList.remove('click'); }, 420);
+  });
+
+  (function loop() {
+    // lerp positions
+    rx += (mx - rx) * 0.13;
+    ry += (my - ry) * 0.13;
+    hx += (mx - hx) * 0.07;
+    hy += (my - hy) * 0.07;
+
+    // velocity → rotation (gives a slight "rolling wheel" feel)
+    var vx = rx - rpx;
+    var vy = ry - rpy;
+    rpx = rx; rpy = ry;
+    var speed = Math.sqrt(vx*vx + vy*vy);
+    rotDeg += speed * 0.9;
+
+    // lerp scale
+    var targetScale = isHov ? 1.5 : 1;
+    ringScale += (targetScale - ringScale) * 0.16;
+
+    // apply transforms (never left/top after init)
+    dot.style.transform  = 'translate3d(' + (mx - DOT_R) + 'px,' + (my - DOT_R) + 'px,0)';
+    ring.style.transform = 'translate3d(' + (rx - RING_R) + 'px,' + (ry - RING_R) + 'px,0) scale(' + ringScale.toFixed(3) + ') rotate(' + rotDeg.toFixed(1) + 'deg)';
+    halo.style.transform = 'translate3d(' + (hx - HALO_R) + 'px,' + (hy - HALO_R) + 'px,0)';
+
+    requestAnimationFrame(loop);
+  })();
+
+  // contextual label + hover scale
+  var LABELS = { mcard: 'Ver', 'float-wa': 'Chat', 'btn-wa': 'Chat' };
+  function getLabel(el) {
+    for (var cls in LABELS) {
+      if (el.classList.contains(cls)) return LABELS[cls];
+    }
+    if (el.tagName === 'A' && el.hostname && el.hostname !== location.hostname) return 'Ir';
+    return '';
+  }
+
+  document.querySelectorAll('a, button, .mcard, .ctab').forEach(function(el) {
+    el.addEventListener('mouseenter', function() {
+      isHov = true;
+      ring.classList.add('hov');
+      var txt = getLabel(el);
+      if (label) label.textContent = txt;
+    });
+    el.addEventListener('mouseleave', function() {
+      isHov = false;
+      ring.classList.remove('hov');
+      if (label) label.textContent = '';
+    });
+  });
+
+  // magnetic float-wa button
+  var floatWa = document.querySelector('.float-wa');
+  if (floatWa) {
+    floatWa.addEventListener('mousemove', function(e) {
+      var r  = floatWa.getBoundingClientRect();
+      var dx = e.clientX - (r.left + r.width  / 2);
+      var dy = e.clientY - (r.top  + r.height / 2);
+      floatWa.style.transform = 'translate(' + (dx * 0.38) + 'px,' + (dy * 0.38) + 'px) scale(1.1)';
+    });
+    floatWa.addEventListener('mouseleave', function() {
+      floatWa.style.transform = '';
+    });
+  }
 })();
-document.querySelectorAll('a, button, .mcard, .ctab').forEach(function(el) {
-  el.addEventListener('mouseenter', function() { curRing.classList.add('hov'); });
-  el.addEventListener('mouseleave', function() { curRing.classList.remove('hov'); });
-});
 
 // ── Floating particles ──
 (function() {
