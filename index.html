@@ -45,21 +45,38 @@
     #loader {
       position: fixed; inset: 0; z-index: 10000;
       background: var(--bg);
-      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.4rem;
-      transition: opacity 0.7s ease, transform 0.7s cubic-bezier(.76,0,.24,1);
+      overflow: hidden;
+      transition: transform 0.9s cubic-bezier(.76,0,.24,1);
     }
-    #loader.out { opacity: 0; transform: translateY(-100%); pointer-events: none; }
-    .ldr-icon { width: 52px; height: 52px; fill: var(--amber); animation: ldrBounce 1s ease-in-out infinite alternate; }
-    @keyframes ldrBounce {
-      from { transform: scale(0.88) translateY(5px); opacity: 0.7; }
-      to   { transform: scale(1.08) translateY(-5px); opacity: 1; }
+    #loader.out { transform: translateY(-100%); pointer-events: none; }
+    #ldrCanvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+    .ldr-ui {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: flex-end;
+      padding-bottom: 12%; pointer-events: none;
     }
-    .ldr-name { font-family: var(--serif); font-size: 1.1rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--cream); animation: fadeUp 0.7s 0.5s both; }
-    .ldr-name span { color: var(--amber); }
-    .ldr-sub { font-size: 0.68rem; letter-spacing: 0.32em; text-transform: uppercase; color: var(--muted); animation: fadeUp 0.7s 0.7s both; }
-    .ldr-bar { width: 140px; height: 1px; background: var(--line); border-radius: 1px; overflow: hidden; animation: fadeUp 0.5s 0.3s both; }
-    .ldr-bar-fill { height: 100%; background: linear-gradient(90deg, var(--amber), var(--gold)); width: 0; animation: ldrFill 2s cubic-bezier(.22,.61,.36,1) 0.3s forwards; }
-    @keyframes ldrFill { to { width: 100%; } }
+    .ldr-brand {
+      text-align: center;
+      opacity: 0; transform: translateY(20px);
+      transition: opacity 0.9s ease, transform 0.9s ease;
+    }
+    .ldr-brand.show { opacity: 1; transform: translateY(0); }
+    .ldr-title {
+      font-family: var(--serif); font-size: clamp(2rem,6vw,3.4rem);
+      font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--cream); line-height: 1;
+    }
+    .ldr-title em { color: var(--amber); font-style: normal; }
+    .ldr-tagline {
+      font-size: 0.68rem; letter-spacing: 0.34em; text-transform: uppercase;
+      color: var(--muted); margin-top: 0.6rem;
+    }
+    .ldr-pct {
+      font-family: var(--serif); font-size: 0.75rem; font-weight: 700;
+      color: rgba(200,135,58,0.55); letter-spacing: 0.16em;
+      margin-top: 1.2rem;
+    }
 
     /* ── Global ── */
     .scroll-prog { position: fixed; top: 0; left: 0; height: 2px; background: linear-gradient(90deg, var(--amber), var(--gold)); width: 0; z-index: 200; transition: width 0.1s linear; }
@@ -344,14 +361,14 @@
 
 <!-- Loader -->
 <div id="loader">
-  <svg class="ldr-icon" viewBox="0 0 64 64">
-    <path d="M52 20H14a2 2 0 0 0-2 2v6c0 12 8 20 20 20s20-8 20-20v-6a2 2 0 0 0-2-2zm-2 8c0 9.9-6.1 16-18 16S14 37.9 14 28v-4h36v4zm4-10a4 4 0 0 1 4 4c0 5-4 9-9 9v-4c2.8 0 5-2.2 5-5a2 2 0 0 0-2-2v-2h2z"/>
-    <rect x="24" y="6" width="4" height="8" rx="2"/>
-    <rect x="36" y="6" width="4" height="8" rx="2"/>
-  </svg>
-  <p class="ldr-name">Kahwa <span>Café</span></p>
-  <p class="ldr-sub">Speciality Coffee House</p>
-  <div class="ldr-bar"><div class="ldr-bar-fill"></div></div>
+  <canvas id="ldrCanvas"></canvas>
+  <div class="ldr-ui">
+    <div class="ldr-brand" id="ldrBrand">
+      <p class="ldr-title">Kahwa <em>Café</em></p>
+      <p class="ldr-tagline">Speciality Coffee House · Buenos Aires</p>
+      <p class="ldr-pct" id="ldrPct">Preparando tu taza...</p>
+    </div>
+  </div>
 </div>
 
 <div class="scroll-prog" id="scrollProg"></div>
@@ -1030,12 +1047,258 @@
 </a>
 
 <script>
-// ── Loader ──
-window.addEventListener('load', function() {
-  setTimeout(function() {
-    document.getElementById('loader').classList.add('out');
-  }, 2600);
-});
+// ── Loader: Coffee Pour Animation ──
+(function() {
+  var canvas  = document.getElementById('ldrCanvas');
+  var ctx     = canvas.getContext('2d');
+  var brand   = document.getElementById('ldrBrand');
+  var pctEl   = document.getElementById('ldrPct');
+  var W, H;
+
+  function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+  window.addEventListener('resize', resize, { passive: true });
+  resize();
+
+  // ── timing (ms) ──
+  var T_LAND  = 700;   // cup fully dropped
+  var T_TILT  = 1200;  // cup fully tilted
+  var T_FILL  = 3600;  // liquid fully fills screen
+  var T_HOLD  = 4100;  // pause before drain
+  var T_DONE  = 5000;  // drain complete → hide
+
+  var waveOff = 0;
+  var pageDone = false;
+  var animDone = false;
+  var startTS  = null;
+
+  function easeOut(t) { return 1 - Math.pow(1 - Math.min(t, 1), 3); }
+  function easeInOut(t) { return t < .5 ? 4*t*t*t : 1-Math.pow(-2*t+2,3)/2; }
+
+  // ── draw cup (canvas coords, centered at 0,0) ──
+  function drawCup(angle, alpha) {
+    var cw = 96, ch = 82;
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.rotate(angle);
+
+    // shadow
+    ctx.shadowColor = 'rgba(0,0,0,0.45)';
+    ctx.shadowBlur  = 28;
+    ctx.shadowOffsetY = 14;
+
+    // body
+    ctx.beginPath();
+    ctx.moveTo(-cw*.5, -ch*.5);
+    ctx.lineTo( cw*.5, -ch*.5);
+    ctx.lineTo( cw*.42, ch*.5);
+    ctx.lineTo(-cw*.42, ch*.5);
+    ctx.closePath();
+    ctx.fillStyle   = '#1C1916';
+    ctx.fill();
+    ctx.strokeStyle = '#C8873A';
+    ctx.lineWidth   = 2.5;
+    ctx.stroke();
+
+    // coffee inside
+    ctx.beginPath();
+    ctx.moveTo(-cw*.44, ch*.28);
+    ctx.lineTo( cw*.38, ch*.28);
+    ctx.lineTo( cw*.42, ch*.5);
+    ctx.lineTo(-cw*.42, ch*.5);
+    ctx.closePath();
+    ctx.fillStyle = '#5C2E0A';
+    ctx.fill();
+
+    // rim highlight
+    ctx.shadowColor = 'transparent';
+    ctx.beginPath();
+    ctx.moveTo(-cw*.5, -ch*.5); ctx.lineTo(cw*.5, -ch*.5);
+    ctx.strokeStyle = 'rgba(232,200,112,0.5)';
+    ctx.lineWidth   = 1.5;
+    ctx.stroke();
+
+    // handle (right side)
+    ctx.beginPath();
+    ctx.arc(cw*.5 + 20, -4, 22, -Math.PI*.58, Math.PI*.58);
+    ctx.strokeStyle = '#C8873A';
+    ctx.lineWidth   = 3.5;
+    ctx.stroke();
+
+    ctx.restore();
+  }
+
+  // ── draw liquid (bottom-up fill) ──
+  // fillTop: 0 = full screen, 1 = completely off bottom
+  function drawLiquid(fillTop, drainShift) {
+    var ty = H * fillTop + (drainShift || 0);
+    if (ty >= H) return;
+
+    ctx.save();
+
+    // main body
+    var grad = ctx.createLinearGradient(0, ty, 0, H);
+    grad.addColorStop(0,    '#6B3618');
+    grad.addColorStop(0.06, '#4A2210');
+    grad.addColorStop(0.5,  '#2E1508');
+    grad.addColorStop(1,    '#180A04');
+
+    ctx.beginPath();
+    ctx.moveTo(0, H);
+    ctx.lineTo(0, ty);
+    for (var x = 0; x <= W; x += 5) {
+      var w1 = Math.sin(x*.016 + waveOff) * 8;
+      var w2 = Math.sin(x*.033 + waveOff*1.6) * 4;
+      var w3 = Math.sin(x*.007 + waveOff*.5) * 12;
+      ctx.lineTo(x, ty + w1 + w2 + w3);
+    }
+    ctx.lineTo(W, ty);
+    ctx.lineTo(W, H);
+    ctx.closePath();
+    ctx.fillStyle = grad;
+    ctx.fill();
+
+    // foam/crema on surface
+    ctx.beginPath();
+    ctx.moveTo(0, ty);
+    for (var x = 0; x <= W; x += 5) {
+      var w1 = Math.sin(x*.016 + waveOff) * 8;
+      var w2 = Math.sin(x*.033 + waveOff*1.6) * 4;
+      var w3 = Math.sin(x*.007 + waveOff*.5) * 12;
+      ctx.lineTo(x, ty + w1 + w2 + w3);
+    }
+    for (var x = W; x >= 0; x -= 5) {
+      var w1 = Math.sin(x*.016 + waveOff) * 8;
+      var w2 = Math.sin(x*.033 + waveOff*1.6) * 4;
+      var w3 = Math.sin(x*.007 + waveOff*.5) * 12;
+      ctx.lineTo(x, ty + w1 + w2 + w3 + 28);
+    }
+    ctx.closePath();
+    var foamGrad = ctx.createLinearGradient(0, ty, 0, ty + 28);
+    foamGrad.addColorStop(0,   'rgba(200,135,58,0.6)');
+    foamGrad.addColorStop(0.5, 'rgba(160,100,40,0.2)');
+    foamGrad.addColorStop(1,   'rgba(100,50,15,0)');
+    ctx.fillStyle = foamGrad;
+    ctx.fill();
+
+    // subtle inner shimmer
+    var shine = ctx.createRadialGradient(W*.5, ty + H*.15, 0, W*.5, ty + H*.15, W*.55);
+    shine.addColorStop(0, 'rgba(120,70,30,0.12)');
+    shine.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = shine;
+    ctx.beginPath(); ctx.rect(0, ty, W, H - ty); ctx.fill();
+
+    ctx.restore();
+  }
+
+  // ── draw stream from cup to liquid surface ──
+  function drawStream(cupX, cupY, cupAngle, fillTop, t) {
+    var angle  = cupAngle;
+    // left-top corner of rotated cup = pour point
+    var pX = cupX + Math.cos(angle)*(-48) - Math.sin(angle)*(-41);
+    var pY = cupY + Math.sin(angle)*(-48) + Math.cos(angle)*(-41);
+    var liqY   = H * fillTop;
+    var wobble = Math.sin(t * .004) * 7;
+
+    ctx.save();
+    // narrowing stream
+    var streamW = Math.max(4, 11 * (fillTop));
+    ctx.strokeStyle = '#4A2210';
+    ctx.lineWidth   = streamW;
+    ctx.lineCap     = 'round';
+    ctx.globalAlpha = 0.88;
+    ctx.beginPath();
+    ctx.moveTo(pX, pY);
+    ctx.bezierCurveTo(
+      pX - 18, pY + (liqY - pY) * .35,
+      W*.5 + wobble + 15, pY + (liqY - pY) * .7,
+      W*.5 + wobble * .4, liqY
+    );
+    ctx.stroke();
+
+    // splash glow at impact
+    var sp = Math.abs(Math.sin(t*.007));
+    ctx.globalAlpha = 0.4 + sp * .3;
+    ctx.fillStyle   = '#7A4018';
+    ctx.beginPath();
+    ctx.arc(W*.5 + wobble*.4, liqY, 8 + sp * 5, 0, Math.PI*2);
+    ctx.fill();
+
+    ctx.restore();
+  }
+
+  // ── main loop ──
+  function frame(ts) {
+    if (!startTS) startTS = ts;
+    var t = ts - startTS;
+
+    ctx.clearRect(0, 0, W, H);
+    waveOff += 0.042;
+
+    var cupX  = W * .5;
+    var cupY  = 0;
+    var angle = 0;
+    var fillTop    = 1;   // 1 = no liquid, 0 = full screen
+    var drainShift = 0;
+    var streaming  = false;
+
+    if (t < T_LAND) {
+      // cup drops from above with bounce
+      var p = easeOut(t / T_LAND);
+      cupY  = H * .22 - (1 - p) * H * .5;
+      angle = 0;
+    } else if (t < T_TILT) {
+      // cup tilts
+      var p = easeOut((t - T_LAND) / (T_TILT - T_LAND));
+      cupY  = H * .22;
+      angle = -p * Math.PI * .72;
+    } else if (t < T_FILL) {
+      // coffee pours and fills screen from bottom
+      var p = easeInOut((t - T_TILT) / (T_FILL - T_TILT));
+      cupY     = H * .22;
+      angle    = -Math.PI * .72;
+      fillTop  = 1 - p;
+      streaming = (fillTop > 0.01);
+      // update percentage text
+      var pct = Math.round(p * 100);
+      if (pctEl) pctEl.textContent = pct + '% · preparando...';
+      if (p > .55 && brand) brand.classList.add('show');
+    } else if (t < T_HOLD) {
+      // hold - liquid settles, cup starts righting
+      var p = easeOut((t - T_FILL) / (T_HOLD - T_FILL));
+      cupY  = H * .22;
+      angle = -Math.PI * .72 * (1 - p * .3);
+      fillTop = 0;
+      if (pctEl) pctEl.textContent = '¡Listo!';
+    } else if (t < T_DONE) {
+      // drain: entire liquid block slides down off screen
+      var p = easeInOut((t - T_HOLD) / (T_DONE - T_HOLD));
+      drainShift = p * H * 1.1;
+      cupY  = H * .22 - p * H * .5; // cup rises away
+      angle = -Math.PI * .72 * (1 - p);
+      fillTop = 0;
+    } else {
+      animDone = true;
+      if (pageDone) document.getElementById('loader').classList.add('out');
+      return;
+    }
+
+    // draw back-to-front
+    drawLiquid(fillTop, drainShift);
+    if (t > T_LAND * .3) {
+      ctx.save(); ctx.translate(cupX, cupY); drawCup(angle, 1); ctx.restore();
+    }
+    if (streaming) drawStream(cupX, cupY, angle, fillTop, t);
+
+    requestAnimationFrame(frame);
+  }
+
+  requestAnimationFrame(frame);
+
+  window.addEventListener('load', function() {
+    pageDone = true;
+    if (animDone) document.getElementById('loader').classList.add('out');
+  });
+})();
 
 // ── Nav scroll ──
 var navbar = document.getElementById('navbar');
