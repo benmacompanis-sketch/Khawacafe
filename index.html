@@ -120,6 +120,7 @@
     @keyframes floatY   { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-9px); } }
     @keyframes dotPulse { 0%,100% { opacity: 0.3; transform: scale(0.8); } 50% { opacity: 1; transform: scale(1.2); } }
     @keyframes gradShift { 0%,100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+    @keyframes wordIn { from { opacity: 0; transform: translateY(54%) rotateX(15deg); } to { opacity: 1; transform: translateY(0) rotateX(0deg); } }
 
     /* ── Reveal ── */
     .reveal { opacity: 0; transform: translateY(22px); transition: opacity 0.9s cubic-bezier(.22,.61,.36,1), transform 0.9s cubic-bezier(.22,.61,.36,1); }
@@ -129,8 +130,9 @@
 
     /* ── Typography ── */
     .eyebrow { font-family: var(--sans); font-size: 0.68rem; font-weight: 500; letter-spacing: 0.3em; text-transform: uppercase; color: var(--amber); }
-    h2.stitle { font-family: var(--serif); font-weight: 700; font-size: clamp(2.4rem,4.5vw,3.6rem); line-height: 1.05; letter-spacing: -0.02em; }
+    h2.stitle { font-family: var(--serif); font-weight: 700; font-size: clamp(2.4rem,4.5vw,3.6rem); line-height: 1.05; letter-spacing: -0.02em; perspective: 600px; }
     h2.stitle em { font-style: italic; font-weight: 400; color: var(--amber); }
+    .anim-word { display: inline-block; animation: wordIn 0.72s cubic-bezier(.22,.61,.36,1) both; will-change: transform, opacity; }
 
     /* ── Nav ── */
     nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 1.4rem 2.5rem; transition: background 0.4s, backdrop-filter 0.4s, border-color 0.4s, padding 0.3s; border-bottom: 1px solid transparent; }
@@ -496,6 +498,15 @@
     .foot-col a:hover { color: var(--amber); }
     .foot-bottom { border-top: 1px solid var(--line); padding-top: 1.6rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; font-size: 0.75rem; color: var(--muted); }
     #openStatus { transition: color 0.4s; }
+
+    /* ── Section scroll-nav ── */
+    .scroll-nav { position: fixed; right: 1.3rem; top: 50%; transform: translateY(-50%); z-index: 50; display: flex; flex-direction: column; gap: 0.5rem; pointer-events: none; }
+    .sn-item { display: flex; align-items: center; gap: 0.55rem; cursor: pointer; pointer-events: all; justify-content: flex-end; }
+    .sn-dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(110,102,96,0.4); transition: width 0.3s, height 0.3s, background 0.3s, box-shadow 0.3s; flex-shrink: 0; }
+    .sn-item.active .sn-dot { width: 8px; height: 8px; background: var(--amber); box-shadow: 0 0 8px rgba(200,135,58,0.5); }
+    .sn-lbl { font-size: 0.53rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); opacity: 0; transform: translateX(8px); transition: opacity 0.2s, transform 0.2s; white-space: nowrap; }
+    .sn-item:hover .sn-lbl, .sn-item.active .sn-lbl { opacity: 1; transform: translateX(0); }
+    @media (max-width: 900px) { .scroll-nav { display: none; } }
 
     /* ── Float WA ── */
     .float-wa { position: fixed; bottom: 1.8rem; right: 1.8rem; z-index: 99; width: 56px; height: 56px; background: #25D366; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; box-shadow: 0 8px 22px -8px rgba(37,211,102,0.65); animation: fadeUp 0.8s 2.5s both; transition: transform 0.25s, box-shadow 0.25s; }
@@ -1998,6 +2009,105 @@ document.querySelectorAll('.map-btn').forEach(function(btn) {
   el.textContent  = open ? 'Abierto ahora' : 'Cerrado ahora';
   el.style.color  = open ? '#4ade80' : 'var(--muted)';
   el.previousElementSibling.style.background = open ? '#4ade80' : 'var(--muted)';
+})();
+
+// ── Section scroll-nav ──
+(function() {
+  var SECS = [
+    { id: 'hero',        lbl: 'Inicio'   },
+    { id: 'nosotros',    lbl: 'Nosotros' },
+    { id: 'menu',        lbl: 'Menú'     },
+    { id: 'carta',       lbl: 'Carta'    },
+    { id: 'testimonios', lbl: 'Reseñas'  },
+    { id: 'galeria',     lbl: 'Galería'  },
+    { id: 'horarios',    lbl: 'Horarios' },
+    { id: 'ubicacion',   lbl: 'Sedes'    },
+    { id: 'contacto',    lbl: 'Contacto' },
+  ];
+
+  var nav = document.createElement('nav');
+  nav.className = 'scroll-nav';
+  var items = [];
+
+  SECS.forEach(function(s) {
+    var sec = document.getElementById(s.id);
+    if (!sec) return;
+    var item = document.createElement('div');
+    item.className = 'sn-item';
+    item.innerHTML = '<span class="sn-lbl">' + s.lbl + '</span><span class="sn-dot"></span>';
+    item.addEventListener('click', function() { sec.scrollIntoView({ behavior: 'smooth' }); });
+    nav.appendChild(item);
+    items.push({ sec: sec, el: item });
+  });
+
+  document.body.appendChild(nav);
+
+  // mark active section
+  var activeEl = null;
+  var obs = new IntersectionObserver(function(entries) {
+    entries.forEach(function(e) {
+      if (!e.isIntersecting) return;
+      if (activeEl) activeEl.classList.remove('active');
+      var found = items.find(function(it) { return it.sec === e.target; });
+      if (found) { found.el.classList.add('active'); activeEl = found.el; }
+    });
+  }, { threshold: 0.35 });
+
+  items.forEach(function(it) { obs.observe(it.sec); });
+})();
+
+// ── Word-split animation on section headings ──
+(function() {
+  var STAGGER = 0.075;
+
+  function splitWords(h) {
+    var nodes = Array.from(h.childNodes);
+    h.innerHTML = '';
+    var wi = 0;
+    nodes.forEach(function(node) {
+      if (node.nodeType === 3) {
+        node.textContent.split(/(\s+)/).forEach(function(part) {
+          if (/\S/.test(part)) {
+            var s = document.createElement('span');
+            s.className = 'anim-word';
+            s.style.animationDelay = (wi++ * STAGGER) + 's';
+            s.textContent = part;
+            h.appendChild(s);
+          } else if (part) {
+            h.appendChild(document.createTextNode(part));
+          }
+        });
+      } else if (node.tagName === 'BR') {
+        h.appendChild(document.createElement('br'));
+      } else {
+        // preserve em/strong as a single animated word
+        var s = document.createElement('span');
+        s.className = 'anim-word';
+        s.style.animationDelay = (wi++ * STAGGER) + 's';
+        s.appendChild(node.cloneNode(true));
+        h.appendChild(s);
+      }
+    });
+  }
+
+  var obs = new IntersectionObserver(function(entries) {
+    entries.forEach(function(e) {
+      if (!e.isIntersecting || e.target.dataset.wsplit) return;
+      e.target.dataset.wsplit = '1';
+      splitWords(e.target);
+    });
+  }, { threshold: 0.5 });
+
+  document.querySelectorAll('h2.stitle').forEach(function(h) { obs.observe(h); });
+})();
+
+// ── Hero parallax on scroll ──
+(function() {
+  var heroBg = document.querySelector('.hero-bg');
+  if (!heroBg) return;
+  window.addEventListener('scroll', function() {
+    heroBg.style.transform = 'translateY(' + (window.scrollY * 0.28) + 'px)';
+  }, { passive: true });
 })();
 
 // ── Film grain overlay ──
