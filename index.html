@@ -581,12 +581,14 @@
     @media (max-width: 600px) { .ig-grid { grid-template-columns: repeat(2,1fr); } }
 
     /* ── Section scroll-nav ── */
-    .scroll-nav { position: fixed; right: 1.3rem; top: 50%; transform: translateY(-50%); z-index: 50; display: flex; flex-direction: column; gap: 0.5rem; pointer-events: none; }
-    .sn-item { display: flex; align-items: center; gap: 0.55rem; cursor: pointer; pointer-events: all; justify-content: flex-end; }
+    .scroll-nav { position: fixed; right: 1.2rem; bottom: 9rem; z-index: 50; display: flex; flex-direction: column; gap: 0.45rem; pointer-events: none; align-items: center; }
+    .sn-item { cursor: pointer; pointer-events: all; position: relative; display: flex; align-items: center; justify-content: center; padding: 3px; }
     .sn-dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(110,102,96,0.4); transition: width 0.3s, height 0.3s, background 0.3s, box-shadow 0.3s; flex-shrink: 0; }
     .sn-item.active .sn-dot { width: 8px; height: 8px; background: var(--amber); box-shadow: 0 0 8px rgba(200,135,58,0.5); }
-    .sn-lbl { font-size: 0.53rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); opacity: 0; transform: translateX(8px); transition: opacity 0.2s, transform 0.2s; white-space: nowrap; }
-    .sn-item:hover .sn-lbl, .sn-item.active .sn-lbl { opacity: 1; transform: translateX(0); }
+    .sn-item:hover .sn-dot { background: rgba(200,135,58,0.6); }
+    /* tooltip on hover — aparece a la izquierda del dot */
+    .sn-item::before { content: attr(data-lbl); position: absolute; right: calc(100% + 8px); top: 50%; transform: translateY(-50%); font-size: 0.52rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); white-space: nowrap; background: rgba(12,10,8,0.85); border: 1px solid var(--line); border-radius: 4px; padding: 0.22rem 0.55rem; backdrop-filter: blur(6px); opacity: 0; transition: opacity 0.18s; pointer-events: none; }
+    .sn-item:hover::before { opacity: 1; }
     @media (max-width: 900px) { .scroll-nav { display: none; } }
 
     /* ── Float WA ── */
@@ -2356,7 +2358,8 @@ document.querySelectorAll('.map-btn').forEach(function(btn) {
     if (!sec) return;
     var item = document.createElement('div');
     item.className = 'sn-item';
-    item.innerHTML = '<span class="sn-lbl">' + s.lbl + '</span><span class="sn-dot"></span>';
+    item.setAttribute('data-lbl', s.lbl);
+    item.innerHTML = '<span class="sn-dot"></span>';
     item.addEventListener('click', function() { sec.scrollIntoView({ behavior: 'smooth' }); });
     nav.appendChild(item);
     items.push({ sec: sec, el: item });
