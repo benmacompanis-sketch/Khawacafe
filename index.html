@@ -534,6 +534,52 @@
       .proc-steps { grid-template-columns: 1fr 1fr; }
     }
 
+    /* ── Momentos (Instagram grid) ── */
+    #momentos { background: var(--bg); }
+    .momentos-top { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
+    .momentos-brand { display: flex; align-items: center; gap: 0.65rem; }
+    .momentos-brand svg { width: 20px; height: 20px; color: var(--amber); flex-shrink: 0; }
+    .momentos-handle { font-family: var(--serif); font-weight: 700; font-size: 1.05rem; color: var(--cream); }
+    .momentos-sub { font-size: 0.68rem; color: var(--muted); letter-spacing: 0.1em; margin-top: 0.15rem; }
+    .ig-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 0.55rem; }
+    .ig-cell { position: relative; aspect-ratio: 1/1; overflow: hidden; border-radius: 8px; cursor: pointer; opacity: 0; transform: translateY(14px); transition: opacity 0.55s cubic-bezier(.22,.61,.36,1), transform 0.55s cubic-bezier(.22,.61,.36,1); }
+    .ig-cell.show { opacity: 1; transform: translateY(0); }
+    .ig-cell > div:first-child { width: 100%; height: 100%; transition: transform 0.65s cubic-bezier(.22,.61,.36,1); }
+    .ig-cell:hover > div:first-child { transform: scale(1.07); }
+    .im1 { background: radial-gradient(ellipse 65% 58% at 48% 42%, #c8873a 0%, #7a4018 30%, #3d1a08 58%, #0c0a08 100%); }
+    .im2 { background: linear-gradient(158deg, #0c1018 0%, #0e1820 40%, #121e2a 65%, rgba(80,140,180,.07) 100%); }
+    .im3 { background: linear-gradient(138deg, #1a0e06 0%, #2e1a0a 38%, #3d2510 58%, #1a0e06 100%); }
+    .im4 { background: radial-gradient(ellipse 58% 75% at 42% 28%, #5c2e0a 0%, #2e1508 48%, #0c0a08 100%); }
+    .im5 { background: linear-gradient(170deg, #3d1a08 0%, rgba(200,135,58,.68) 26%, #5c2e0a 58%, #0c0a08 100%); }
+    .im6 { background: radial-gradient(ellipse 70% 70% at 55% 55%, #2a1808 0%, #0c0a08 100%); }
+    .ig-overlay {
+      position: absolute; inset: 0; background: rgba(4,2,1,.62);
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.5rem;
+      opacity: 0; transition: opacity 0.28s;
+    }
+    .ig-cell:hover .ig-overlay { opacity: 1; }
+    .ig-stats { display: flex; gap: 1.2rem; }
+    .ig-stat { display: flex; align-items: center; gap: 0.35rem; font-family: var(--serif); font-weight: 700; font-size: 0.9rem; color: #fff; }
+    .ig-stat svg { width: 14px; height: 14px; fill: currentColor; flex-shrink: 0; }
+    .ig-cap { font-size: 0.65rem; color: rgba(255,255,255,.58); text-align: center; max-width: 130px; line-height: 1.42; letter-spacing: 0.02em; }
+    .momentos-cta { margin-top: 1.6rem; text-align: center; }
+
+    /* ── polish: scroll anchors ── */
+    section[id] { scroll-margin-top: 80px; }
+    /* enhanced sede-card hover */
+    .sede-card { transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s; }
+    .sede-card:hover { border-color: rgba(200,135,58,0.4); transform: translateY(-3px); box-shadow: 0 14px 28px -16px rgba(0,0,0,0.6); }
+    /* CTA ambient orbs */
+    #contacto .cta-orb { position: absolute; border-radius: 50%; pointer-events: none; filter: blur(80px); }
+    #contacto .cta-orb.o1 { width: 420px; height: 420px; top: -120px; right: -80px; background: rgba(200,135,58,0.07); animation: drift 20s ease-in-out infinite; }
+    #contacto .cta-orb.o2 { width: 320px; height: 320px; bottom: -80px; left: -60px; background: rgba(232,200,112,0.05); animation: drift 26s ease-in-out infinite reverse; }
+    /* prefers-reduced-motion */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+    }
+
+    @media (max-width: 600px) { .ig-grid { grid-template-columns: repeat(2,1fr); } }
+
     /* ── Section scroll-nav ── */
     .scroll-nav { position: fixed; right: 1.3rem; top: 50%; transform: translateY(-50%); z-index: 50; display: flex; flex-direction: column; gap: 0.5rem; pointer-events: none; }
     .sn-item { display: flex; align-items: center; gap: 0.55rem; cursor: pointer; pointer-events: all; justify-content: flex-end; }
@@ -1321,6 +1367,163 @@
   </div>
 </div>
 
+<!-- Momentos -->
+<section id="momentos">
+  <div class="container">
+    <div class="momentos-top reveal">
+      <div>
+        <div class="momentos-brand">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+          <span class="momentos-handle">@cafe.kahwa</span>
+        </div>
+        <p class="momentos-sub">Seguinos en Instagram · cada momento importa</p>
+      </div>
+      <a href="https://instagram.com/cafe.kahwa" target="_blank" rel="noopener" class="btn-outline" style="padding:.65rem 1.4rem;font-size:.8rem;">Ver perfil →</a>
+    </div>
+
+    <div class="ig-grid reveal d1">
+
+      <!-- post 1: latte art -->
+      <div class="ig-cell" data-cursor="Ver">
+        <div class="im1">
+          <svg width="100%" height="100%" viewBox="0 0 300 300" preserveAspectRatio="xMidYMid slice" fill="none">
+            <circle cx="150" cy="145" r="88" stroke="rgba(255,220,160,0.2)" stroke-width="1.5"/>
+            <path d="M150 80 Q192 110 180 145 Q168 178 150 188 Q132 178 120 145 Q108 110 150 80Z" fill="rgba(255,210,140,0.32)"/>
+            <path d="M150 95 Q182 118 172 145 Q162 170 150 178 Q138 170 128 145 Q118 118 150 95Z" fill="rgba(255,215,155,0.2)"/>
+            <ellipse cx="150" cy="148" rx="32" ry="25" fill="rgba(200,135,58,0.22)"/>
+            <path d="M136 134 Q150 126 164 134 Q158 148 150 152 Q142 148 136 134Z" fill="rgba(255,225,170,0.28)"/>
+          </svg>
+        </div>
+        <div class="ig-overlay">
+          <div class="ig-stats">
+            <span class="ig-stat"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>842</span>
+            <span class="ig-stat"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>23</span>
+          </div>
+          <p class="ig-cap">el flat white de los lunes ☕</p>
+        </div>
+      </div>
+
+      <!-- post 2: cold brew + ice -->
+      <div class="ig-cell" data-cursor="Ver">
+        <div class="im2">
+          <svg width="100%" height="100%" viewBox="0 0 300 300" preserveAspectRatio="xMidYMid slice" fill="none">
+            <rect x="88" y="70" width="30" height="30" rx="4" fill="rgba(180,220,255,0.08)" stroke="rgba(180,220,255,0.12)" stroke-width="1" transform="rotate(12,103,85)"/>
+            <rect x="175" y="95" width="24" height="24" rx="3" fill="rgba(180,220,255,0.07)" stroke="rgba(180,220,255,0.1)" stroke-width="1" transform="rotate(-8,187,107)"/>
+            <rect x="120" y="110" width="28" height="28" rx="4" fill="rgba(180,220,255,0.07)" stroke="rgba(180,220,255,0.1)" stroke-width="1" transform="rotate(5,134,124)"/>
+            <path d="M90 190 Q150 170 210 190 L210 250 Q150 270 90 250 Z" fill="rgba(14,24,36,0.8)" stroke="rgba(80,140,180,0.2)" stroke-width="1.5"/>
+            <ellipse cx="150" cy="190" rx="60" ry="10" fill="rgba(80,140,180,0.12)"/>
+            <circle cx="120" cy="135" r="5" fill="rgba(180,220,255,0.12)"/>
+            <circle cx="168" cy="148" r="4" fill="rgba(180,220,255,0.1)"/>
+            <circle cx="145" cy="162" r="3.5" fill="rgba(180,220,255,0.1)"/>
+          </svg>
+        </div>
+        <div class="ig-overlay">
+          <div class="ig-stats">
+            <span class="ig-stat"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>1.2k</span>
+            <span class="ig-stat"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>47</span>
+          </div>
+          <p class="ig-cap">cold brew de verano 🧊</p>
+        </div>
+      </div>
+
+      <!-- post 3: interior -->
+      <div class="ig-cell" data-cursor="Ver">
+        <div class="im3">
+          <svg width="100%" height="100%" viewBox="0 0 300 300" preserveAspectRatio="xMidYMid slice" fill="none">
+            <rect x="70" y="55" width="160" height="140" rx="3" stroke="rgba(200,135,58,0.15)" stroke-width="1.5" fill="none"/>
+            <line x1="150" y1="55" x2="150" y2="195" stroke="rgba(200,135,58,0.08)" stroke-width="1"/>
+            <line x1="70" y1="125" x2="230" y2="125" stroke="rgba(200,135,58,0.08)" stroke-width="1"/>
+            <circle cx="150" cy="125" r="40" fill="rgba(200,135,58,0.06)"/>
+            <circle cx="150" cy="125" r="22" fill="rgba(200,135,58,0.04)"/>
+            <line x1="70" y1="210" x2="230" y2="210" stroke="rgba(42,36,32,0.9)" stroke-width="2"/>
+            <rect x="95" y="218" width="50" height="38" rx="3" fill="rgba(28,22,18,0.8)" stroke="rgba(200,135,58,0.12)" stroke-width="1"/>
+            <rect x="155" y="218" width="50" height="38" rx="3" fill="rgba(28,22,18,0.8)" stroke="rgba(200,135,58,0.12)" stroke-width="1"/>
+          </svg>
+        </div>
+        <div class="ig-overlay">
+          <div class="ig-stats">
+            <span class="ig-stat"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>678</span>
+            <span class="ig-stat"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>18</span>
+          </div>
+          <p class="ig-cap">tarde de domingo en Palermo 🌿</p>
+        </div>
+      </div>
+
+      <!-- post 4: barista -->
+      <div class="ig-cell" data-cursor="Ver">
+        <div class="im4">
+          <svg width="100%" height="100%" viewBox="0 0 300 300" preserveAspectRatio="xMidYMid slice" fill="none">
+            <circle cx="150" cy="88" r="34" fill="rgba(92,46,10,0.85)" stroke="rgba(200,135,58,0.18)" stroke-width="1.5"/>
+            <path d="M100 300 Q100 210 122 195 Q136 187 150 187 Q164 187 178 195 Q200 210 200 300" fill="rgba(46,28,14,0.9)" stroke="rgba(200,135,58,0.14)" stroke-width="1.5"/>
+            <path d="M118 210 Q150 202 182 210 L186 240 Q150 234 114 240Z" fill="rgba(200,135,58,0.1)" stroke="rgba(200,135,58,0.25)" stroke-width="1"/>
+            <path d="M96 175 Q85 165 82 152 Q80 138 90 130" stroke="rgba(200,135,58,0.3)" stroke-width="2" stroke-linecap="round" fill="none"/>
+            <path d="M204 175 Q215 165 218 152 Q220 138 210 130" stroke="rgba(200,135,58,0.3)" stroke-width="2" stroke-linecap="round" fill="none"/>
+          </svg>
+        </div>
+        <div class="ig-overlay">
+          <div class="ig-stats">
+            <span class="ig-stat"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>956</span>
+            <span class="ig-stat"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>31</span>
+          </div>
+          <p class="ig-cap">nuestro equipo detrás del contador 🤎</p>
+        </div>
+      </div>
+
+      <!-- post 5: pastry / croissant -->
+      <div class="ig-cell" data-cursor="Ver">
+        <div class="im5">
+          <svg width="100%" height="100%" viewBox="0 0 300 300" preserveAspectRatio="xMidYMid slice" fill="none">
+            <path d="M75 190 Q90 130 150 105 Q210 80 235 110 Q260 140 230 180 Q200 220 150 225 Q100 230 75 190Z" fill="rgba(220,155,60,0.25)" stroke="rgba(220,155,60,0.3)" stroke-width="1.5"/>
+            <path d="M90 188 Q100 140 150 118 Q200 96 222 122 Q244 148 218 178 Q192 208 150 212 Q108 216 90 188Z" fill="rgba(200,130,50,0.18)" stroke="rgba(220,155,60,0.2)" stroke-width="1"/>
+            <path d="M105 186 Q110 152 150 132 Q190 112 210 134 Q230 156 206 176 Q182 196 150 198 Q118 200 105 186Z" fill="rgba(180,115,45,0.15)"/>
+            <line x1="105" y1="175" x2="195" y2="135" stroke="rgba(220,155,60,0.12)" stroke-width="8" stroke-linecap="round"/>
+            <line x1="108" y1="188" x2="208" y2="154" stroke="rgba(220,155,60,0.10)" stroke-width="6" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="ig-overlay">
+          <div class="ig-stats">
+            <span class="ig-stat"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>1.1k</span>
+            <span class="ig-stat"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>39</span>
+          </div>
+          <p class="ig-cap">medialunas de manteca, todos los días 🥐</p>
+        </div>
+      </div>
+
+      <!-- post 6: coffee ring art -->
+      <div class="ig-cell" data-cursor="Ver">
+        <div class="im6">
+          <svg width="100%" height="100%" viewBox="0 0 300 300" preserveAspectRatio="xMidYMid slice" fill="none">
+            <circle cx="150" cy="150" r="90" stroke="rgba(200,135,58,0.12)" stroke-width="1.5"/>
+            <circle cx="150" cy="150" r="66" stroke="rgba(200,135,58,0.18)" stroke-width="1"/>
+            <circle cx="150" cy="150" r="44" stroke="rgba(200,135,58,0.22)" stroke-width="1.5"/>
+            <circle cx="150" cy="150" r="24" fill="rgba(200,135,58,0.08)" stroke="rgba(200,135,58,0.3)" stroke-width="1.5"/>
+            <circle cx="150" cy="150" r="8" fill="rgba(200,135,58,0.25)"/>
+            <line x1="60"  y1="150" x2="90"  y2="150" stroke="rgba(200,135,58,0.12)" stroke-width="1"/>
+            <line x1="210" y1="150" x2="240" y2="150" stroke="rgba(200,135,58,0.12)" stroke-width="1"/>
+            <line x1="150" y1="60"  x2="150" y2="90"  stroke="rgba(200,135,58,0.12)" stroke-width="1"/>
+            <line x1="150" y1="210" x2="150" y2="240" stroke="rgba(200,135,58,0.12)" stroke-width="1"/>
+          </svg>
+        </div>
+        <div class="ig-overlay">
+          <div class="ig-stats">
+            <span class="ig-stat"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>734</span>
+            <span class="ig-stat"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>22</span>
+          </div>
+          <p class="ig-cap">el arte en cada taza ✨</p>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="momentos-cta reveal d2">
+      <a href="https://instagram.com/cafe.kahwa" target="_blank" rel="noopener" class="btn-primary">
+        Ver más en Instagram
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+      </a>
+    </div>
+  </div>
+</section>
+
 <!-- Horarios & Contacto -->
 <section id="horarios">
   <div class="container">
@@ -1426,6 +1629,8 @@
 
 <!-- CTA -->
 <section id="contacto">
+  <div class="cta-orb o1"></div>
+  <div class="cta-orb o2"></div>
   <div class="container">
     <span class="eyebrow">¿Querés saber más?</span>
     <h2 class="stitle">Visitanos o<br><em>escribinos</em>.</h2>
@@ -2136,6 +2341,7 @@ document.querySelectorAll('.map-btn').forEach(function(btn) {
     { id: 'carta',       lbl: 'Carta'    },
     { id: 'testimonios', lbl: 'Reseñas'  },
     { id: 'galeria',     lbl: 'Galería'  },
+    { id: 'momentos',    lbl: 'Instagram'},
     { id: 'horarios',    lbl: 'Horarios' },
     { id: 'ubicacion',   lbl: 'Sedes'    },
     { id: 'contacto',    lbl: 'Contacto' },
@@ -2170,6 +2376,20 @@ document.querySelectorAll('.map-btn').forEach(function(btn) {
   }, { threshold: 0.35 });
 
   items.forEach(function(it) { obs.observe(it.sec); });
+})();
+
+// ── Momentos ig-grid stagger ──
+(function() {
+  var grid = document.querySelector('.ig-grid');
+  if (!grid) return;
+  var obs = new IntersectionObserver(function(entries) {
+    if (!entries[0].isIntersecting) return;
+    grid.querySelectorAll('.ig-cell').forEach(function(c, i) {
+      setTimeout(function() { c.classList.add('show'); }, i * 90);
+    });
+    obs.unobserve(grid);
+  }, { threshold: 0.15 });
+  obs.observe(grid);
 })();
 
 // ── Proceso timeline ──
