@@ -499,6 +499,41 @@
     .foot-bottom { border-top: 1px solid var(--line); padding-top: 1.6rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; font-size: 0.75rem; color: var(--muted); }
     #openStatus { transition: color 0.4s; }
 
+    /* ── Proceso (grain to cup) ── */
+    #proceso { background: var(--bg2); border-top: 1px solid var(--line); }
+    .proc-intro { max-width: 560px; margin-bottom: 5rem; }
+    .proc-wrap  { position: relative; }
+    .proc-line-track { position: absolute; top: 27px; left: calc(10% + 28px); right: calc(10% + 28px); height: 1px; background: var(--line); pointer-events: none; }
+    .proc-line-fill  { position: absolute; inset: 0; width: 0; background: linear-gradient(90deg, var(--amber), var(--gold)); transition: width 1.8s cubic-bezier(.22,.61,.36,1); }
+    .proc-line-track.run .proc-line-fill { width: 100%; }
+    .proc-steps { display: grid; grid-template-columns: repeat(5,1fr); position: relative; }
+    .proc-step  {
+      display: flex; flex-direction: column; align-items: center; text-align: center;
+      padding: 0 1.2rem 2rem;
+      opacity: 0; transform: translateY(22px);
+      transition: opacity 0.65s cubic-bezier(.22,.61,.36,1), transform 0.65s cubic-bezier(.22,.61,.36,1);
+    }
+    .proc-step.show { opacity: 1; transform: translateY(0); }
+    .proc-ico {
+      width: 54px; height: 54px; border-radius: 50%; flex-shrink: 0;
+      background: var(--card); border: 1px solid var(--line);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--amber); position: relative; z-index: 1; margin-bottom: 1.5rem;
+      transition: border-color 0.5s, background 0.5s, box-shadow 0.5s;
+    }
+    .proc-step.show .proc-ico { border-color: rgba(200,135,58,0.5); background: rgba(200,135,58,0.07); box-shadow: 0 0 18px -6px rgba(200,135,58,0.25); }
+    .proc-ico svg { width: 20px; height: 20px; }
+    .proc-num   { font-family: var(--serif); font-size: 0.56rem; font-weight: 800; letter-spacing: 0.22em; color: rgba(200,135,58,0.55); margin-bottom: 0.55rem; }
+    .proc-title { font-family: var(--serif); font-weight: 700; font-size: 1rem; color: var(--cream); margin-bottom: 0.5rem; line-height: 1.15; }
+    .proc-desc  { font-size: 0.79rem; color: var(--muted); line-height: 1.52; max-width: 148px; }
+    @media (max-width: 900px) {
+      .proc-steps { grid-template-columns: repeat(3,1fr); row-gap: 2.5rem; }
+      .proc-line-track { display: none; }
+    }
+    @media (max-width: 600px) {
+      .proc-steps { grid-template-columns: 1fr 1fr; }
+    }
+
     /* ── Section scroll-nav ── */
     .scroll-nav { position: fixed; right: 1.3rem; top: 50%; transform: translateY(-50%); z-index: 50; display: flex; flex-direction: column; gap: 0.5rem; pointer-events: none; }
     .sn-item { display: flex; align-items: center; gap: 0.55rem; cursor: pointer; pointer-events: all; justify-content: flex-end; }
@@ -708,6 +743,86 @@
           <span class="fb-n">Salguero 2052</span>
           <span class="fb-l">Palermo · CABA</span>
         </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Proceso: de grano a taza -->
+<section id="proceso">
+  <div class="container">
+    <div class="proc-intro reveal">
+      <span class="eyebrow">Nuestro proceso</span>
+      <h2 class="stitle" style="margin-top:1rem;">Del origen<br>a tu <em>taza</em>.</h2>
+    </div>
+    <div class="proc-wrap reveal d2">
+      <div class="proc-line-track" id="procLine"><div class="proc-line-fill"></div></div>
+      <div class="proc-steps">
+
+        <div class="proc-step">
+          <div class="proc-ico">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
+              <circle cx="12" cy="9" r="2.5"/>
+            </svg>
+          </div>
+          <p class="proc-num">01</p>
+          <h4 class="proc-title">Origen</h4>
+          <p class="proc-desc">Etiopía, Colombia y Brasil. Trazabilidad completa de cada lote.</p>
+        </div>
+
+        <div class="proc-step">
+          <div class="proc-ico">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="7"/>
+              <path d="M21 21l-4.35-4.35"/>
+              <path d="M8 11h6M11 8v6"/>
+            </svg>
+          </div>
+          <p class="proc-num">02</p>
+          <h4 class="proc-title">Selección</h4>
+          <p class="proc-desc">Catamos cada lote. Solo los mejores granos pasan a la siguiente etapa.</p>
+        </div>
+
+        <div class="proc-step">
+          <div class="proc-ico">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83"/>
+              <circle cx="12" cy="12" r="4"/>
+              <path d="M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+            </svg>
+          </div>
+          <p class="proc-num">03</p>
+          <h4 class="proc-title">Tostado</h4>
+          <p class="proc-desc">Perfiles de tueste personalizados. Claro o medio para preservar el terroir.</p>
+        </div>
+
+        <div class="proc-step">
+          <div class="proc-ico">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 9h16v2a8 8 0 0 1-8 8 8 8 0 0 1-8-8V9z"/>
+              <path d="M8 9V5a4 4 0 0 1 8 0v4"/>
+              <path d="M20 9v2a2 2 0 0 0 2-2V9h-2z"/>
+            </svg>
+          </div>
+          <p class="proc-num">04</p>
+          <h4 class="proc-title">Extracción</h4>
+          <p class="proc-desc">92 °C, 9 bares. Cada shot calculado al gramo y al segundo.</p>
+        </div>
+
+        <div class="proc-step">
+          <div class="proc-ico">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 8h1a4 4 0 0 1 0 8h-1"/>
+              <path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V8z"/>
+              <line x1="6" y1="2" x2="6" y2="4"/><line x1="10" y1="2" x2="10" y2="4"/><line x1="14" y1="2" x2="14" y2="4"/>
+            </svg>
+          </div>
+          <p class="proc-num">05</p>
+          <h4 class="proc-title">Tu taza</h4>
+          <p class="proc-desc">Todo el proceso en tu mano. En cualquiera de nuestras 5 sedes.</p>
+        </div>
+
       </div>
     </div>
   </div>
@@ -2016,6 +2131,7 @@ document.querySelectorAll('.map-btn').forEach(function(btn) {
   var SECS = [
     { id: 'hero',        lbl: 'Inicio'   },
     { id: 'nosotros',    lbl: 'Nosotros' },
+    { id: 'proceso',     lbl: 'Proceso'  },
     { id: 'menu',        lbl: 'Menú'     },
     { id: 'carta',       lbl: 'Carta'    },
     { id: 'testimonios', lbl: 'Reseñas'  },
@@ -2054,6 +2170,25 @@ document.querySelectorAll('.map-btn').forEach(function(btn) {
   }, { threshold: 0.35 });
 
   items.forEach(function(it) { obs.observe(it.sec); });
+})();
+
+// ── Proceso timeline ──
+(function() {
+  var sec   = document.getElementById('proceso');
+  var line  = document.getElementById('procLine');
+  var steps = document.querySelectorAll('#proceso .proc-step');
+  if (!sec) return;
+
+  var obs = new IntersectionObserver(function(entries) {
+    if (!entries[0].isIntersecting) return;
+    if (line) line.classList.add('run');
+    steps.forEach(function(s, i) {
+      setTimeout(function() { s.classList.add('show'); }, 220 + i * 180);
+    });
+    obs.unobserve(sec);
+  }, { threshold: 0.25 });
+
+  obs.observe(sec);
 })();
 
 // ── Word-split animation on section headings ──
